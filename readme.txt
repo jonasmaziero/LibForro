@@ -1,16 +1,16 @@
 LibForro: A Fortran Library for Generating Random Objects
 
-  In this library, we will continuously add and improve Fortran code to generate random numbers, 
+In this library, we will continuously add and improve Fortran code to generate random numbers, 
 probability vectors, unitary matrices, state vectors, and density matrices.
 
-  One can use this library simply by copying all the files to the main program's folder and compiling them with:
+One can use this library simply by copying all the files to the main program's folder and compiling them with:
 $ gfortran -lblas -llapack -lforq *.f90
-  To run the executable file a.out generated just use:
+To run the executable file a.out generated just use:
 $ ./a.out
 
 REMARK: As can be seen above, LibForro depends on BLAS [1], Lapack [2], and LibForQ [3].
 
-  Another, perhaps more convenient, manner of using LibForro is by creating a static compiled version of it.  
+Another, perhaps more convenient, manner of using LibForro is by creating a static compiled version of it.  
 For that purpose you may follow the simple steps listed below:
 1) Download the code
 2) Go to the associated folder
@@ -19,14 +19,15 @@ $ gfortran -O3 -c rng_mt.f90
 $ gfortran -O3 -c *.f90
 and
 $ ar cr libforro.a *.o *.mod 
-  To compile your main program using this library, copy libforro.a to your program's folder and use the command: 
+To compile your main program using this library, copy libforro.a to your program's folder and use the command: 
 $ gfortran -lblas -llapack -lforq libforro.a main.f90
-  Even better, you can also copy the library to your computer's libraries folder, e.g. with:
+Even better, you can also copy the library to your computer's libraries folder, e.g. with:
 $ sudo cp libforro.a /usr/local/lib
 and use it, anywhere in your computer, via
 $ gfortran -lblas -llapack -lforq -lforro main.f90
 
-REMARK: The main tools available in LibForro are the same as those explained in Ref. [4]. The only change we 
+REMARK: The main tools available in LibForro are the same as those explained in Ref. [4], whose associated 
+code is available in https://github.com/jonasmaziero/LibForQ-v1. The only change we 
 want to mention here was made in order to avoid some complications one may have when generating the static 
 library using a module to share the options for the generators. In this new version of LibForro, we call the 
 generators as explained in [4], but we add a new variable to the first position of all calling argument lists. 
@@ -41,3 +42,5 @@ References:
 [2] http://www.netlib.org/lapack
 [3] https://github.com/jonasmaziero/LibForro.git
 [4] J. Maziero, Fortran code for generating random probability vectors, unitaries, and quantum states, Front. ICT 3, 4 (2016).
+[5] J. Maziero, Generating pseudo-random discrete probability distributions, Braz. J. Phys. 45, 377 (2015), [arXiv:1502.02128].
+[6] J. Maziero, Random sampling of quantum states: A survey of methods, Braz. J. Phys. 45 (2015), [arXiv:1502.03644].
