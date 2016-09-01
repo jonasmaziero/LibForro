@@ -1,7 +1,8 @@
 !###################################################################################################################################
 !                                                   Random unitary matrix generators
 !###################################################################################################################################
-subroutine ru_gram_schmidt(optg, d, ru)  ! Returns a dxd random unitary matrix by applying the Gram-Schmidt procedure to a random gaussian complex matrix 
+subroutine ru_gram_schmidt(optg, d, ru)  ! Returns a dxd random unitary matrix by applying the Gram-Schmidt procedure to a 
+                                         !random gaussian complex matrix 
 ! Ref: Diaconis, P. (2005). What is ... a random matrix?, Notices of the AMS 52, 1348.
 implicit none
 integer :: d  ! Dimension of the rando unitary
@@ -13,7 +14,8 @@ allocate( A(1:d,1:d) ) ;   call ginibre(optg, d, d, A) ;   call gram_schmidt_mod
 
 end
 !------------------------------------------------------------------------------------------------------------------------------------
-subroutine ru_householder(optg, d, ru) ! Returns a dxd random unitary matrix using one of LAPACK's QR factorization subroutine (uses Hoseholder reflections)
+subroutine ru_householder(optg, d, ru) ! Returns a dxd random unitary matrix using one of LAPACK's QR factorization subroutine 
+                                       ! (uses Hoseholder reflections)
 ! Ref: Mezzadri, F. (2007). How to generate random matrices from the classical compact groups, Notices of the AMS 54, 592.
 implicit none
 integer :: d  ! Dimension of the random unitary
