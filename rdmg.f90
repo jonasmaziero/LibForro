@@ -77,23 +77,38 @@ deallocate ( rsv, proj )
 
 end
 !-----------------------------------------------------------------------------------------------------------------------------------
-subroutine rdm_bds(rbds) ! Generates a random Bell-diagonal state
+subroutine rdm_bds(rrho)  ! Returns a random Bell-diagonal state
 implicit none
-complex(8) :: rbds(4,4)  ! Random Bell-diagonal density matrix 
-complex(8), allocatable :: psi_p(:), psi_m(:), phi_p(:), phi_m(:)  ! For the Bell states
-real(8), allocatable :: rpv(:)  ! For the random probability vector
-complex(8), allocatable :: proj(:,:)  ! For the projectors
-character(10), dimension(5) :: optg  ! Options for the generators
+real(8) :: rpv(1:4)  ! The random probability vector
+character(10), dimension(5) :: optg ! Options for the generators
+real(8) :: c11, c22, c33  ! Correlation functions
+complex(8) :: rrho(1:4,1:4)  ! The random state
 
-allocate( psi_p(4), psi_m(4), phi_p(4), phi_m(4), rpv(4), proj(4,4) ) 
-call bell_basis(psi_p, psi_m, phi_p, phi_m)
-optg = 'std' ;   call rng_init(optg) ;   call rpvg(optg, 4, rpv)
-rbds = 0.d0
-call projector(psi_p, 4, proj) ;   rbds = rbds + rpv(1)*proj
-call projector(psi_m, 4, proj) ;   rbds = rbds + rpv(2)*proj
-call projector(phi_p, 4, proj) ;   rbds = rbds + rpv(3)*proj
-call projector(phi_m, 4, proj) ;   rbds = rbds + rpv(4)*proj
-deallocate ( psi_p, psi_m, phi_p, phi_m, rpv, proj )
+ optg = 'std' ;   call rpvg(optg, 4, rpv) 
+ c11 = 2.d0*(rpv(1)+rpv(2)) - 1.d0 ;   c22 = 2.d0*(rpv(2)+rpv(3)) - 1.d0 ;   c33 = 2.d0*(rpv(1)+rpv(3)) - 1.d0
+ call rho_bds(c11, c22, c33, rrho) 
+
+end
+!-----------------------------------------------------------------------------------------------------------------------------------
+subroutine rdm_x(rrho)  ! Returns a random X state (in standard form)
+implicit none
+real(8) :: rn(1:5)  ! Vector of random numbers
+character(10), dimension(5) :: optg ! Options for the generators
+complex(8) :: rrho(1:4,1:4)  ! The random state
+real(8) :: c11, c22, c33, a3, b3, p1, p2, p3, p4  !  Correlation functions, polarizations, and probabilities
+
+optg = 'std'
+do
+  call rng_unif(optg, 5, -1.d0, 1.d0, rn)
+  c11 = rn(1) ; c22 = rn(2) ; c33 = rn(3) ; a3 = rn(4) ; b3 = rn(5)
+  p1 = (1.d0/4.d0)*(1.d0-c33-sqrt((c11+c22)**2.d0 + (a3-b3)**2.d0))
+  p2 = (1.d0/4.d0)*(1.d0-c33+sqrt((c11+c22)**2.d0 + (a3-b3)**2.d0))
+  p3 = (1.d0/4.d0)*(1.d0+c33-sqrt((c11-c22)**2.d0 + (a3+b3)**2.d0))
+  p4 = (1.d0/4.d0)*(1.d0+c33+sqrt((c11-c22)**2.d0 + (a3+b3)**2.d0))
+  if ((p1 >= 0.d0) .and. (p2 >= 0.d0) .and. (p3 >= 0.d0) .and. (p4 >= 0.d0)) then
+    call rho_x(c11, c22, c33, a3, b3, rrho) ;   exit 
+  endif
+enddo
 
 end
 !###################################################################################################################################
