@@ -101,10 +101,32 @@ optg = 'std'
 do
   call rng_unif(optg, 5, -1.d0, 1.d0, rn)
   c11 = rn(1) ; c22 = rn(2) ; c33 = rn(3) ; a3 = rn(4) ; b3 = rn(5)
-  p1 = (1.d0/4.d0)*(1.d0-c33-sqrt((c11+c22)**2.d0 + (a3-b3)**2.d0))
-  p2 = (1.d0/4.d0)*(1.d0-c33+sqrt((c11+c22)**2.d0 + (a3-b3)**2.d0))
-  p3 = (1.d0/4.d0)*(1.d0+c33-sqrt((c11-c22)**2.d0 + (a3+b3)**2.d0))
-  p4 = (1.d0/4.d0)*(1.d0+c33+sqrt((c11-c22)**2.d0 + (a3+b3)**2.d0))
+  p1 = 0.25d0*(1.d0-c33-sqrt((c11+c22)**2.d0 + (a3-b3)**2.d0))
+  p2 = 0.25d0*(1.d0-c33+sqrt((c11+c22)**2.d0 + (a3-b3)**2.d0))
+  p3 = 0.25d0*(1.d0+c33-sqrt((c11-c22)**2.d0 + (a3+b3)**2.d0))
+  p4 = 0.25d0*(1.d0+c33+sqrt((c11-c22)**2.d0 + (a3+b3)**2.d0))
+  if ((p1 >= 0.d0) .and. (p2 >= 0.d0) .and. (p3 >= 0.d0) .and. (p4 >= 0.d0)) then
+    call rho_x(c11, c22, c33, a3, b3, rrho) ;   exit 
+  endif
+enddo
+
+end
+!-----------------------------------------------------------------------------------------------------------------------------------
+subroutine rdm_xs(rrho)  ! Returns a random X state (in standard form), & symmetric under particle exchange
+implicit none
+real(8) :: rn(1:4)  ! Vector of random numbers
+character(10), dimension(5) :: optg ! Options for the generators
+complex(8) :: rrho(1:4,1:4)  ! The random state
+real(8) :: c11, c22, c33, a3, b3, p1, p2, p3, p4  !  Correlation functions, polarizations, and probabilities
+
+optg = 'std'
+do
+  call rng_unif(optg, 4, -1.d0, 1.d0, rn)
+  c11 = rn(1) ;   c22 = rn(2) ;   c33 = rn(3) ;   a3 = rn(4) ;   b3 = a3
+  p1 = 0.25d0*(1.d0-c33-sqrt((c11+c22)**2.d0))
+  p2 = 0.25d0*(1.d0-c33+sqrt((c11+c22)**2.d0))
+  p3 = 0.25d0*(1.d0+c33-sqrt((c11-c22)**2.d0 + 4.d0*(a3**2.d0)))
+  p4 = 0.25d0*(1.d0+c33+sqrt((c11-c22)**2.d0 + 4.d0*(a3**2.d0)))
   if ((p1 >= 0.d0) .and. (p2 >= 0.d0) .and. (p3 >= 0.d0) .and. (p4 >= 0.d0)) then
     call rho_x(c11, c22, c33, a3, b3, rrho) ;   exit 
   endif
