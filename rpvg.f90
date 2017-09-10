@@ -169,3 +169,56 @@ else if ( optg(2) == "kraemer" ) then ;   call rpv_kraemer(optg, d, rpv)
 
 end
 !###################################################################################################################################
+!                                                       Tests - RPVG
+!###################################################################################################################################
+subroutine rpvg_tests(optg, d, ns, ni) ! Some simple tests for the random probability vector generators
+implicit none
+integer, parameter :: d != 3  ! Dimension of the random probability vectors
+integer, parameter :: ns != 10**6  ! No. of samples for the averages and probability distributions
+integer, parameter :: ni != 100  ! No. of intervals for the domain of the RPV components
+real(8) :: delta != 1.d0/dble(ni) ! Step for the domain of the RPV components
+real(8) :: rpv(1:d), avg_rpv(1:d)  ! Random probability vector and its average
+real(8) :: t1, t2  ! Times
+integer :: j, k, l  ! Auxiliary variables for counters
+integer :: ct(1:ni,1:d) = 0  ! Counter for the probability densities
+character(10), dimension(5) :: optg  ! Options for the generators
+
+call cpu_time(t1)
+
+delta = 1.d0/dble(ni)
+
+write(*,*) "## Performing some tests for the random probability vector generators"
+
+! Sets the methods to be used by the generators
+!optg(1) = RNG ;   optg(2) = RPVG ;  optg(3) =  RUG ;    optg(4) = RSVG ;    optg(5) = RDMG
+!optg(1) = 'std' ;  optg(2) = 'std' ; optg(3) = 'std' ;   optg(4) = 'std' ;   optg(5) = 'std'
+
+
+write(*,*) "# Generating a sampling for 2d scatter plots"
+open(unit = 11, file = 'rpv_2d.dat', status = 'unknown') ! Gnuplot commands to see the results: plot 'rpv_2d.dat'
+do j = 1, 5*10**3 ;   call rpvg(optg, d, rpv) ;  write(11,*) (rpv(k) , k=1,2) ;   enddo
+!do j = 1, 5*10**3 ;   call rpvg(optg, d, rpv) ;  write(11,*) ((1.d0 - rpv(k)) , k=1,2) ; !enddo  ! To put the points above the 'diagonal'
+close(11)
+
+
+write(*,*) "# Computing the probability distribution for the components of the RPVs"
+open(unit = 12, file = 'rpv_pd.dat', status = 'unknown') ! Gnuplot commands to see the results: plot 'rpv_pd.dat'
+avg_rpv = 0.d0
+do j = 1, ns
+  call rpvg(optg, d, rpv) ;   avg_rpv = avg_rpv + rpv
+  do k = 1, d ;   if (rpv(k) == 1.d0) rpv(k) = 1.d0 - 1.d-10
+    do l = 1, ni ;   if ( (rpv(k) >= (dble(l)-1.d0)*delta) .and. (rpv(k) < dble(l)*delta)) ct(l,k) = ct(l,k) + 1 ;   enddo
+  enddo
+enddo
+! Writes  on the screen the average of the (up to) first 5 components of the RPV
+if ( d <= 5 ) write(*,*) 'avg_rpv = ', avg_rpv/dble(ns)
+do l = 1, ni
+  write(12,*) (dble(l)-0.5)*delta, dble(ct(l,1))/dble(ns)  ! Writes the probability density for the first component of the RPV on a file
+  !write(12,*) (dble(l)-0.5)*delta, (dble(ct(l,k))/dble(ns), k=1,d)  ! Writes the probability density for all components of the RPV on a file
+enddo
+close(12)
+
+call cpu_time(t2) ;   write(*,*) 'time=',t2-t1,'seconds'  ! Writes the time taken by this subroutine
+
+end
+!###################################################################################################################################
