@@ -11,7 +11,7 @@ integer, dimension(8) :: values
 integer(4) :: seed
 
 call date_and_time(date,time,zone,values) ;   seed = 1.d3*values(8)
-  
+
 end
 !------------------------------------------------------------------------------------------------------------------------------------
 subroutine init_mt() ! Initializes the Merseene Twister pseudo-random number generator
@@ -21,7 +21,7 @@ integer(4) :: seed
 real(8) :: rn
 
 call sub_rand_seed(seed) ;   call genrand_init(seed) ;   call genrand_real1(rn)
- 
+
 end
 !------------------------------------------------------------------------------------------------------------------------------------
 subroutine rng_mt(d, rn) ! Calls the Mersenne Twister pseudo-random number generator
@@ -40,7 +40,7 @@ IMPLICIT NONE
 INTEGER, ALLOCATABLE :: seed(:)
 INTEGER :: i, n, un, istat, dt(8), pid, t(2), s
 INTEGER(8) :: count, tms
-  
+
 CALL RANDOM_SEED(size = n)
 ALLOCATE(seed(n))
 ! First try if the OS provides a random number generator
@@ -74,10 +74,10 @@ ELSE
   ENDIF
 ENDIF
 CALL RANDOM_SEED(put=seed)
-          
+
 end
 !------------------------------------------------------------------------------------------------------------------------------------
-subroutine rng_gnu(d, rn) ! Calls the Gnu "standard" random number generator. See https://gcc.gnu.org/onlinedocs/gfortran/RANDOM_005fNUMBER.html 
+subroutine rng_gnu(d, rn) ! Calls the Gnu "standard" random number generator. See https://gcc.gnu.org/onlinedocs/gfortran/RANDOM_005fNUMBER.html
 ! The runtime-library implements George Marsaglia's KISS (Keep It Simple Stupid) random number generator.
 implicit none
 integer :: d  ! Dimension of the vector of random numbers
@@ -93,7 +93,7 @@ implicit none
 integer :: seed
 
 call sub_rand_seed(seed) ;   call zufalli(seed)
- 
+
 end
 !------------------------------------------------------------------------------------------------------------------------------------
 subroutine rng_netlib(d, rn) ! Calls Netlib's pseudo-random number generator zufall
@@ -122,7 +122,9 @@ character(10), dimension(5) :: optg  ! Options for the generators
 allocate( rn(1:2*d) ) ;   call rng(optg, 2*d, rn)  ! Allocate memory for and get the uniformly distributed random numbers
 
 do j = 1, 2*d, 2   ! Gets the Gaussianily distributed random numbers
-  if ( rn(j+1) < 1.d-15 ) rn(j+1) = 1.d-15 ;   logterm = sqrt(-2.d0*log(rn(j+1))) ;   angle = 2.d0*pi*rn(j)
+  if ( rn(j+1) < 1.d-15 ) rn(j+1) = 1.d-15
+  logterm = sqrt(-2.d0*log(rn(j+1)))
+  angle = 2.d0*pi*rn(j)
   grn((j+1)/2) = logterm*cos(angle)
 enddo
 
@@ -140,8 +142,8 @@ integer :: j  ! Auxiliary variable for counters
 character(10), dimension(5) :: optg  ! Options for the generators
 
 allocate( rn(1:d) ) ;   call rng(optg, d, rn)  ! Allocate memory for and get the uniformly distributed random numbers
- 
-! Gets the exponentianily distributed random numbers 
+
+! Gets the exponentianily distributed random numbers
 do j = 1, d ;   if ( rn(j) < 1.d-15 ) rn(j+1) = 1.d-15 ;   ern(j) = -log(rn(j)) ;   enddo
 
 deallocate( rn )
@@ -184,6 +186,6 @@ character(10), dimension(5) :: optg  ! Options for the generators
 else if (optg(1) == "gnu") then ;   call rng_gnu(d, rn)  ! ! Calls the Gnu's rng
 else if (optg(1) == "netlib") then ;   call rng_netlib(d, rn)  ! Calls the Netlib's rng
      endif
-  
+
 end
 !###################################################################################################################################
